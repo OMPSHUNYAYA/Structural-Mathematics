@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SSUM-Calc — Structural Calculator</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #0b1020;
+      color: #f7f7ff;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #111729;
+      border-radius: 16px;
+      padding: 24px 24px 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #c5c8ff;
+      margin-bottom: 8px;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: #e4e6ff;
+    }
+    .badge-poc {
+      margin-left: 12px; /* extra spacing before POC / Not for Production */
+    }
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      color: #e8e9ff;
+    }
+    .label {
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      color: #c7c9ff;
+    }
+    .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .input-wide {
+      flex: 1 1 260px;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #050814;
+      color: #f5f5ff;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+    input[type="number"] {
+      max-width: 110px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #7f9dff;
+      box-shadow: 0 0 0 1px rgba(127, 157, 255, 0.3);
+    }
+    button {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: #7f9dff;
+      color: #060712;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: transform 0.06s ease, box-shadow 0.06s ease, background 0.1s ease;
+      white-space: nowrap;
+    }
+    button:hover {
+      background: #9eb4ff;
+      box-shadow: 0 8px 18px rgba(127, 157, 255, 0.35);
+      transform: translateY(-1px);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+    /* smaller primary compute button (about 50% visual size) */
+    #btnCompute {
+      padding: 4px 10px;
+      font-size: 0.8rem;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #e4e6ff;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: none;
+    }
+    .outputs {
+      margin-top: 10px;
+      padding: 12px 12px 10px;
+      border-radius: 12px;
+      background: rgba(8, 14, 32, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.9rem;
+    }
+    .outputs-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-bottom: 6px;
+    }
+    .kv {
+      min-width: 170px;
+    }
+    .kv-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9da2ff;
+    }
+    .kv-value {
+      font-size: 0.9rem;
+      margin-top: 2px;
+    }
+    .status {
+      margin-top: 6px;
+      font-size: 0.85rem;
+      color: #cbd0ff;
+    }
+    .status span {
+      font-weight: 600;
+    }
+    .note {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #9094c9;
+    }
+    .error {
+      margin-top: 6px;
+      font-size: 0.85rem;
+      color: #ff8b9e;
+    }
+    code {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.78rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      margin: 16px 0 12px;
+    }
+    .footer {
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: #8084b0;
+    }
+    .help-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .help-toggle {
+      background: transparent;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      color: #e4e6ff;
+      box-shadow: none;
+    }
+    .help-toggle:hover {
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: none;
+    }
+    .help-panel {
+      margin-top: 8px;
+      padding: 10px 10px 8px;
+      border-radius: 10px;
+      background: rgba(5, 10, 28, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.8rem;
+      color: #c7c9ff;
+      display: none;
+    }
+    .help-panel ul {
+      margin: 4px 0 6px;
+      padding-left: 18px;
+    }
+    .help-panel li {
+      margin-bottom: 2px;
+    }
+    .template-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 4px 0 8px;
+      align-items: center;
+    }
+    .template-label {
+      font-size: 0.8rem;
+      color: #c7c9ff;
+      margin-right: 4px;
+    }
+    .template-btn {
+      font-size: 0.78rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.03);
+      color: #e4e6ff;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .template-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 4px 0 2px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>SSUM-Calc — Structural Calculator</h1>
+  <div class="subtitle">Structured numbers • Classical results • Behavioural insight</div>
+  <div class="badge-row">
+    <div class="badge">SSUM core demo</div>
+    <div class="badge">100% classical fidelity</div>
+    <div class="badge">Deterministic • Offline • Single-file</div>
+    <div class="badge badge-poc">POC • Not for Production</div>
+  </div>
+
+  <div class="section-title">Expression</div>
+  <div class="label">
+    Enter a classical arithmetic expression. Examples:
+    <code>3 * (5 + 2)</code>, <code>sin(pi/2)</code>, <code>sin(30°)</code>, <code>log10(25)</code>.
+  </div>
+
+  <div class="template-row">
+    <span class="template-label">Templates:</span>
+    <button type="button" class="template-btn" data-template="3 * (5 + 2)" aria-label="Insert template 3 times (5 plus 2)">3 * (5 + 2)</button>
+    <button type="button" class="template-btn" data-template="10 / (2 - 7)" aria-label="Insert template 10 divided by (2 minus 7)">10 / (2 - 7)</button>
+    <button type="button" class="template-btn" data-template="sin(pi/2)" aria-label="Insert template sine of pi over 2">sin(pi/2)</button>
+    <button type="button" class="template-btn" data-template="cos(pi/4)" aria-label="Insert template cosine of pi over 4">cos(pi/4)</button>
+    <button type="button" class="template-btn" data-template="sin(x°)" aria-label="Insert template sine of x degrees">sin(x°)</button>
+    <button type="button" class="template-btn" data-template="cos(x°)" aria-label="Insert template cosine of x degrees">cos(x°)</button>
+    <button type="button" class="template-btn" data-template="exp(x)" aria-label="Insert template exponential of x">exp(x)</button>
+    <button type="button" class="template-btn" data-template="log10(x)" aria-label="Insert template base 10 logarithm of x">log10(x)</button>
+    <button type="button" class="template-btn" data-template="log(x)" aria-label="Insert template natural logarithm of x">log(x)</button>
+    <button type="button" class="template-btn" data-template="sqrt(x)" aria-label="Insert template square root of x">sqrt(x)</button>
+    <button type="button" class="template-btn" data-template="π" aria-label="Insert pi symbol">π</button>
+  </div>
+
+  <div class="input-row">
+    <div class="input-wide">
+      <input id="expr" type="text" value="3 * (5 + 2)" aria-label="Expression input" />
+    </div>
+    <div>
+      <span class="label">Default alignment <code>a</code> (−0.99 to +0.99)</span>
+      <input id="defaultA" type="number" step="0.01" min="-0.99" max="0.99" value="0.99" aria-label="Default alignment a" />
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button id="btnCompute" type="button" aria-label="Compute expression">Compute</button>
+    <button id="btnClear" type="button" class="btn-secondary" aria-label="Clear all">AC</button>
+  </div>
+
+  <div class="outputs" id="outputs" role="region" aria-label="Outputs">
+    <div class="outputs-row">
+      <div class="kv">
+        <div class="kv-label">Classical result</div>
+        <div class="kv-value" id="outClassical" aria-label="Classical result value">—</div>
+      </div>
+      <div class="kv">
+        <div class="kv-label">SSUM collapse <code>phi((m, a, s))</code></div>
+        <div class="kv-value" id="outSsum" aria-label="SSUM collapse value">—</div>
+      </div>
+      <div class="kv">
+        <div class="kv-label">Final alignment <code>a*</code></div>
+        <div class="kv-value" id="outAlign" aria-label="Final alignment value">—</div>
+      </div>
+      <div class="kv">
+        <div class="kv-label">Structural signature <code>s*</code></div>
+        <div class="kv-value" id="outStruct" aria-label="Structural signature value">—</div>
+      </div>
+    </div>
+
+    <div class="status" id="outStatus" role="status" aria-live="polite">
+      Enter an expression and press <b>Compute</b>.
+    </div>
+    <div class="error" id="outError" role="alert" aria-live="assertive"></div>
+  </div>
+
+  <hr />
+
+  <div class="section-title">How this demo behaves</div>
+  <div class="help-header">
+    <div class="label">
+      View structural details, supported functions, and example expressions.
+    </div>
+    <button id="helpToggle" class="help-toggle" type="button" aria-label="Toggle help and examples">Help / Examples</button>
+  </div>
+  <div id="helpPanel" class="help-panel">
+    <div><b>1. Structural numbers</b></div>
+    <div>
+      Each literal like <code>3</code> or <code>5.2</code> is treated as an SSUM number <code>(m, a, s)</code> with
+      classical magnitude <code>m</code>, default alignment <code>a</code>, and neutral structural signature <code>s = 0</code>.
+      Operators evolve the structural channels while always preserving the classical result <code>phi((m, a, s)) = m</code>.
+    </div>
+
+    <div style="margin-top:6px;"><b>2. Supported operations</b></div>
+    <ul>
+      <li>Operators: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, parentheses <code>( )</code></li>
+      <li>Constant: <code>pi</code> (π)</li>
+      <li>
+        Functions (only these are available in this demo):
+        <code>sin(x)</code>, <code>cos(x)</code>, <code>exp(x)</code>, <code>log10(x)</code>, <code>log(x)</code>, <code>sqrt(x)</code>
+      </li>
+      <li><code>log10(x)</code> is base-10; <code>log(x)</code> is the natural logarithm (base <code>e</code>)</li>
+      <li>Trigonometric functions use radians by default</li>
+      <li>You may enter degrees explicitly using the <code>°</code> symbol (for example, <code>sin(30°)</code>)</li>
+    </ul>
+
+    <div><b>3. Example expressions</b></div>
+    <ul>
+      <li><code>3 * (5 + 2)</code> — basic arithmetic</li>
+      <li><code>10 / (2 - 7)</code> — division and subtraction with a negative result</li>
+      <li><code>sin(pi/2)</code> — radians</li>
+      <li><code>sin(30°)</code>, <code>cos(45°)</code> — degrees</li>
+      <li><code>log10(10)</code> — base-10 log (returns <code>1</code>)</li>
+      <li><code>log(10)</code> — natural log (returns approximately <code>2.302585093</code>)</li>
+      <li><code>(10 / 2) + (8 / 4)</code> — mixed operations</li>
+    </ul>
+
+    <div class="note">
+      Caution: research/observation only. This calculator is a proof-of-concept to illustrate SSUM structural arithmetic.
+      It is not a fully validated scientific, financial, or safety tool. Please do not use it for practical, safety-critical,
+      or production decision-making.
+    </div>
+  </div>
+
+  <div class="footer">
+    SSUM (Shunyaya Structural Universal Mathematics) is a structural extension of classical arithmetic: classical results remain unchanged; structure becomes visible.
+  </div>
+</div>
+
+<script>
+/* ========= SSUM core (ES5 style) ========= */
+
+/* SSUM structured number container: (m, a, s) */
+function SsumNumber(m, a, s) {
+  this.m = m;
+  this.a = (typeof a === "number") ? a : 0.0;
+  this.s = (typeof s === "number") ? s : 0.0;
+}
+
+/* Clamp alignment to open interval (-1, +1) to keep atanh stable */
+function clampAlignment(a) {
+  var eps = 1e-6;
+  if (a >= 1) return 1 - eps;
+  if (a <= -1) return -1 + eps;
+  return a;
+}
+
+/* Safe atanh via clamp; used to convert bounded alignment to rapidity */
+function atanhSafe(a) {
+  a = clampAlignment(a);
+  return 0.5 * Math.log((1 + a) / (1 - a));
+}
+
+/* tanh(u) from rapidity u */
+function tanhFromRapid(u) {
+  var e2u = Math.exp(2 * u);
+  return (e2u - 1) / (e2u + 1);
+}
+
+/* Structural signature (s) combination: neutral averaging + clamp */
+function combineS(a1, s1, a2, s2) {
+  var sRaw = 0.5 * (s1 + s2);
+  return clampAlignment(sRaw);
+}
+
+/* Structural addition: rapidity-weighted mean by |m| weights */
+function ssumAdd(x, y) {
+  var mOut = x.m + y.m;
+
+  var u1 = atanhSafe(x.a);
+  var u2 = atanhSafe(y.a);
+  var w1 = Math.abs(x.m);
+  var w2 = Math.abs(y.m);
+  var aOut;
+  if (w1 + w2 === 0) {
+    aOut = 0.0;
+  } else {
+    var uOut = (w1 * u1 + w2 * u2) / (w1 + w2);
+    aOut = clampAlignment(tanhFromRapid(uOut));
+  }
+  var sOut = combineS(x.a, x.s, y.a, y.s);
+  return new SsumNumber(mOut, aOut, sOut);
+}
+
+/* Structural subtraction: add the negated second operand */
+function ssumSub(x, y) {
+  var yNeg = new SsumNumber(-y.m, y.a, y.s);
+  return ssumAdd(x, yNeg);
+}
+
+/* Structural multiplication: rapidity addition */
+function ssumMul(x, y) {
+  var mOut = x.m * y.m;
+
+  var u1 = atanhSafe(x.a);
+  var u2 = atanhSafe(y.a);
+  var uOut = u1 + u2;
+  var aOut = clampAlignment(tanhFromRapid(uOut));
+
+  var sOut = combineS(x.a, x.s, y.a, y.s);
+  return new SsumNumber(mOut, aOut, sOut);
+}
+
+/* Structural division: rapidity subtraction for division; explicit div-by-zero guard */
+function ssumDiv(x, y) {
+  if (y.m === 0) throw new Error("Division by zero");
+  var mOut = x.m / y.m;
+  if (!isFinite(mOut)) throw new Error("Division produced a non-finite result");
+
+  var u1 = atanhSafe(x.a);
+  var u2 = atanhSafe(y.a);
+  var uOut = u1 - u2;
+  var aOut = clampAlignment(tanhFromRapid(uOut));
+
+  var sOut = combineS(x.a, x.s, y.a, y.s);
+  return new SsumNumber(mOut, aOut, sOut);
+}
+
+/* Unary functions: guard invalid domains (log/log10/sqrt) and non-finite outputs */
+function ssumUnary(fnName, x) {
+  var mOut;
+  if (fnName === "sin")        mOut = Math.sin(x.m);
+  else if (fnName === "cos")   mOut = Math.cos(x.m);
+  else if (fnName === "exp")   mOut = Math.exp(x.m);
+  else if (fnName === "log10") {
+    if (x.m <= 0) throw new Error("log10(x) domain error: x must be > 0");
+    mOut = Math.log(x.m) / Math.LN10;
+  }
+  else if (fnName === "log") {
+    if (x.m <= 0) throw new Error("log(x) domain error: x must be > 0");
+    mOut = Math.log(x.m);
+  }
+  else if (fnName === "sqrt")  {
+    if (x.m < 0) throw new Error("sqrt(x) domain error: x must be >= 0");
+    mOut = Math.sqrt(x.m);
+  }
+  else throw new Error("Unknown function: " + fnName);
+
+  if (!isFinite(mOut)) throw new Error(fnName + "(x) produced a non-finite result");
+  return new SsumNumber(mOut, x.a, x.s);
+}
+
+/* ========= Parsing (shunting-yard) ========= */
+
+var OPERATORS = {
+  "+": { prec: 1, assoc: "L" },
+  "-": { prec: 1, assoc: "L" },
+  "*": { prec: 2, assoc: "L" },
+  "/": { prec: 2, assoc: "L" }
+};
+
+var FUNCTIONS = ["sin", "cos", "exp", "log10", "log", "sqrt"];
+var CONSTANTS = { "pi": Math.PI };
+
+function isFunctionName(name) {
+  for (var i = 0; i < FUNCTIONS.length; i++) {
+    if (FUNCTIONS[i] === name) return true;
+  }
+  return false;
+}
+
+function tokenize(expr) {
+  var tokens = [];
+  var i = 0;
+
+  // Possible values: "start", "number", "const", "func", "op", "paren_open", "paren_close"
+  var prevType = "start";
+
+  function peekNextNonSpace(idx) {
+    while (idx < expr.length && /\s/.test(expr.charAt(idx))) idx++;
+    return (idx < expr.length) ? expr.charAt(idx) : "";
+  }
+
+  while (i < expr.length) {
+    var ch = expr.charAt(i);
+
+    if (/\s/.test(ch)) { i++; continue; }
+
+    // Unary minus support:
+    // If '-' occurs at start, after an operator, or after '(' then it's unary.
+    // If it is followed by a number, parse a signed number token directly (e.g., -2, -0.01).
+    if (ch === "-" && (prevType === "start" || prevType === "op" || prevType === "paren_open")) {
+      var nxt = peekNextNonSpace(i + 1);
+
+      // Case A: -<number>  => parse as one negative numeric literal
+      if (/[0-9.]/.test(nxt)) {
+        var j = i + 1;
+        while (j < expr.length && /\s/.test(expr.charAt(j))) j++;
+        var numStr = "-";
+        while (j < expr.length && /[0-9.]/.test(expr.charAt(j))) {
+          numStr += expr.charAt(j);
+          j++;
+        }
+        tokens.push({ type: "number", value: numStr });
+        prevType = "number";
+        i = j;
+        continue;
+      }
+
+      // Case B: -(...) or -pi or -func(...)  => rewrite as 0 - <thing>
+      tokens.push({ type: "number", value: "0" });
+      tokens.push({ type: "op", value: "-" });
+      prevType = "op";
+      i++;
+      continue;
+    }
+
+    if (/[0-9.]/.test(ch)) {
+      var numStr2 = ch;
+      i++;
+      while (i < expr.length && /[0-9.]/.test(expr.charAt(i))) {
+        numStr2 += expr.charAt(i);
+        i++;
+      }
+      tokens.push({ type: "number", value: numStr2 });
+      prevType = "number";
+      continue;
+    }
+
+    if (/[a-zA-Z]/.test(ch)) {
+      var idStr = ch;
+      i++;
+      while (i < expr.length && /[a-zA-Z0-9_]/.test(expr.charAt(i))) {
+        idStr += expr.charAt(i);
+        i++;
+      }
+      if (isFunctionName(idStr)) {
+        tokens.push({ type: "func", value: idStr });
+        prevType = "func";
+      } else if (CONSTANTS.hasOwnProperty(idStr)) {
+        tokens.push({ type: "const", value: idStr });
+        prevType = "const";
+      } else {
+        throw new Error("Unknown identifier: " + idStr);
+      }
+      continue;
+    }
+
+    if (ch === "(" || ch === ")") {
+      tokens.push({ type: "paren", value: ch });
+      prevType = (ch === "(") ? "paren_open" : "paren_close";
+      i++;
+      continue;
+    }
+
+    if (OPERATORS[ch]) {
+      tokens.push({ type: "op", value: ch });
+      prevType = "op";
+      i++;
+      continue;
+    }
+
+    throw new Error("Unexpected character: " + ch);
+  }
+
+  return tokens;
+}
+
+function toRPN(tokens) {
+  var output = [];
+  var stack = [];
+  var i, t;
+
+  for (i = 0; i < tokens.length; i++) {
+    t = tokens[i];
+    if (t.type === "number" || t.type === "const") {
+      output.push(t);
+    } else if (t.type === "func") {
+      stack.push(t);
+    } else if (t.type === "op") {
+      var o1 = t.value;
+      while (stack.length > 0) {
+        var top = stack[stack.length - 1];
+        if (top.type === "op") {
+          var o2 = top.value;
+          var p1 = OPERATORS[o1].prec;
+          var p2 = OPERATORS[o2].prec;
+          var assoc = OPERATORS[o1].assoc;
+          if ((assoc === "L" && p1 <= p2) || (assoc === "R" && p1 < p2)) {
+            output.push(stack.pop());
+            continue;
+          }
+        }
+        break;
+      }
+      stack.push(t);
+    } else if (t.type === "paren" && t.value === "(") {
+      stack.push(t);
+    } else if (t.type === "paren" && t.value === ")") {
+      while (stack.length > 0 && stack[stack.length - 1].type !== "paren") {
+        output.push(stack.pop());
+      }
+      if (stack.length === 0) throw new Error("Mismatched parentheses");
+      stack.pop();
+      if (stack.length > 0 && stack[stack.length - 1].type === "func") {
+        output.push(stack.pop());
+      }
+    }
+  }
+
+  while (stack.length > 0) {
+    t = stack.pop();
+    if (t.type === "paren") throw new Error("Mismatched parentheses");
+    output.push(t);
+  }
+  return output;
+}
+
+function evalRPN(rpnTokens, defaultA) {
+  var stack = [];
+  for (var i = 0; i < rpnTokens.length; i++) {
+    var t = rpnTokens[i];
+    if (t.type === "number") {
+      var m = parseFloat(t.value);
+      if (!isFinite(m)) throw new Error("Invalid number: " + t.value);
+      stack.push(new SsumNumber(m, defaultA, 0.0));
+    } else if (t.type === "const") {
+      var mc = CONSTANTS[t.value];
+      stack.push(new SsumNumber(mc, defaultA, 0.0));
+    } else if (t.type === "op") {
+      var op = t.value;
+      if (stack.length < 2) throw new Error("Not enough operands for " + op);
+      var b = stack.pop();
+      var a = stack.pop();
+      var res;
+      if (op === "+")      res = ssumAdd(a, b);
+      else if (op === "-") res = ssumSub(a, b);
+      else if (op === "*") res = ssumMul(a, b);
+      else if (op === "/") res = ssumDiv(a, b);
+      else throw new Error("Unknown operator: " + op);
+      stack.push(res);
+    } else if (t.type === "func") {
+      if (stack.length < 1) throw new Error("Not enough operands for function " + t.value);
+      var x = stack.pop();
+      var r = ssumUnary(t.value, x);
+      stack.push(r);
+    } else {
+      throw new Error("Unexpected token in RPN");
+    }
+  }
+  if (stack.length !== 1) throw new Error("Invalid expression");
+  var out = stack[0];
+  if (!isFinite(out.m)) throw new Error("Expression produced a non-finite result");
+  return out;
+}
+
+/* ========= UI helpers ========= */
+
+function classifyAlignment(a) {
+  var absA = Math.abs(a);
+  if (absA > 0.95) return "strongly centred / stable";
+  if (absA > 0.75) return "well aligned with mild drift";
+  if (absA > 0.5)  return "moderately aligned";
+  if (absA > 0.25) return "mixed / partially drifted";
+  return "weakly aligned / high drift";
+}
+
+function formatNumber(x) {
+  if (!isFinite(x)) return String(x);
+  var ax = Math.abs(x);
+  if (ax === 0) return "0";
+  if (ax >= 1e6 || ax <= 1e-4) {
+    return x.toExponential(6);
+  }
+  return x.toFixed(10).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function preprocessExpression(expr) {
+  var out = expr;
+
+  // Strip trailing '=' (e.g. "3*2=")
+  out = out.replace(/=+$/g, "");
+
+  /* Degrees: NUMBER° -> (NUMBER * pi / 180) */
+  out = out.replace(/([0-9]*\.?[0-9]+)\s*°/g, "($1 * pi / 180)");
+
+  /* Multiplying by pi using π symbol */
+  out = out.replace(/\)\s*π/g, ")*pi");                   // )π -> )*pi
+  out = out.replace(/([0-9]*\.?[0-9]+)\s*π/g, "($1*pi)"); // 3π -> (3*pi)
+  out = out.replace(/π/g, "pi");                          // lone π -> pi
+
+  return out;
+}
+
+function computeExpression() {
+  var exprInput = document.getElementById("expr");
+  var expr = exprInput.value.trim();
+  var aStr = document.getElementById("defaultA").value.trim();
+  var outClassical = document.getElementById("outClassical");
+  var outSsum = document.getElementById("outSsum");
+  var outAlign = document.getElementById("outAlign");
+  var outStruct = document.getElementById("outStruct");
+  var outStatus = document.getElementById("outStatus");
+  var outError = document.getElementById("outError");
+
+  outError.textContent = "";
+
+  if (!expr) {
+    outStatus.textContent = "Please enter an expression.";
+    outClassical.textContent = "—";
+    outSsum.textContent = "—";
+    outAlign.textContent = "—";
+    outStruct.textContent = "—";
+    return;
+  }
+
+  var defaultA = parseFloat(aStr);
+  if (!isFinite(defaultA)) defaultA = 0.0;
+  if (defaultA > 0.99) defaultA = 0.99;
+  if (defaultA < -0.99) defaultA = -0.99;
+  document.getElementById("defaultA").value = defaultA.toFixed(2);
+
+  try {
+    var processedExpr = preprocessExpression(expr);
+    var tokens = tokenize(processedExpr);
+    var rpn = toRPN(tokens);
+    var ssumResult = evalRPN(rpn, defaultA);
+
+    var classical = ssumResult.m;
+    var ssumCollapsed = ssumResult.m;
+    var aFinal = ssumResult.a;
+    var sFinal = ssumResult.s;
+
+    if (!isFinite(classical) || !isFinite(aFinal) || !isFinite(sFinal)) {
+      throw new Error("Computation produced a non-finite output");
+    }
+
+    outClassical.textContent = formatNumber(classical);
+    outSsum.textContent = formatNumber(ssumCollapsed);
+    outAlign.textContent = formatNumber(aFinal);
+    outStruct.textContent = formatNumber(sFinal);
+
+    var classification = classifyAlignment(aFinal);
+    outStatus.innerHTML =
+      "SSUM collapse matches the classical result. Final alignment indicates: <span>" +
+      classification + "</span>.";
+  } catch (err) {
+    outClassical.textContent = "—";
+    outSsum.textContent = "—";
+    outAlign.textContent = "—";
+    outStruct.textContent = "—";
+    outStatus.textContent = "Unable to compute expression.";
+    outError.textContent = "Error: " + err.message;
+  }
+}
+
+function clearAll() {
+  var exprInput = document.getElementById("expr");
+  var outClassical = document.getElementById("outClassical");
+  var outSsum = document.getElementById("outSsum");
+  var outAlign = document.getElementById("outAlign");
+  var outStruct = document.getElementById("outStruct");
+  var outStatus = document.getElementById("outStatus");
+  var outError = document.getElementById("outError");
+
+  exprInput.value = "";
+  outClassical.textContent = "—";
+  outSsum.textContent = "—";
+  outAlign.textContent = "—";
+  outStruct.textContent = "—";
+  outError.textContent = "";
+  outStatus.innerHTML = "Cleared. Enter an expression and press <b>Compute</b>.";
+  exprInput.focus();
+}
+
+/* ========= Wiring ========= */
+
+document.getElementById("btnCompute").onclick = computeExpression;
+document.getElementById("btnClear").onclick = clearAll;
+
+document.getElementById("expr").onkeydown = function (e) {
+  e = e || window.event;
+  if (e.key === "Enter" || e.keyCode === 13) {
+    if (e.preventDefault) e.preventDefault();
+    computeExpression();
+  }
+};
+
+document.getElementById("helpToggle").onclick = function () {
+  var panel = document.getElementById("helpPanel");
+  panel.style.display = (panel.style.display === "block") ? "none" : "block";
+};
+
+var templateButtons = document.querySelectorAll ?
+  document.querySelectorAll(".template-btn") : [];
+
+for (var i = 0; i < templateButtons.length; i++) {
+  templateButtons[i].onclick = (function (btn) {
+    return function () {
+      var tmpl = btn.getAttribute("data-template");
+      var exprInput = document.getElementById("expr");
+      var current = exprInput.value;
+      var trimmed = current.replace(/^\s+|\s+$/g, "");
+
+      if (!trimmed) {
+        exprInput.value = tmpl;
+      } else {
+        if (tmpl === "π") {
+          var lastChar = trimmed.charAt(trimmed.length - 1);
+          if ((lastChar >= "0" && lastChar <= "9") || lastChar === ")") {
+            exprInput.value = trimmed + "π";
+          } else {
+            exprInput.value = trimmed + " " + tmpl;
+          }
+        } else {
+          exprInput.value = trimmed + " " + tmpl;
+        }
+      }
+
+      exprInput.focus();
+      if (exprInput.setSelectionRange) {
+        var len = exprInput.value.length;
+        exprInput.setSelectionRange(len, len);
+      }
+    };
+  })(templateButtons[i]);
+}
+</script>
+</body>
+</html>
