@@ -505,6 +505,25 @@ Optional attribution (recommended but not mandatory):
 
 ---
 
+The following establishes naming integrity and compatibility requirements.
+
+### Conformance & Compatibility Notice
+
+Implementations claiming compatibility with Shunyaya Structural Universal Mathematics (SSUM) must preserve the core mathematical guarantee:
+
+```
+phi((m, a, s)) = m
+```
+
+This ensures:
+- classical magnitudes remain exact and unchanged
+- structural channels are observational only
+- no approximation, bias, or numerical drift is introduced
+
+Implementations that alter classical results, violate boundedness, or introduce hidden logic must not be represented as SSUM-compatible.
+
+---
+
 ## 🔗 **Related Shunyaya Projects**
 
 - **SSM** — symbolic mathematics with bounded alignment lanes  
