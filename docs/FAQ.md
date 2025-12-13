@@ -321,6 +321,31 @@ Not for production or safety-critical use.
 
 ---
 
+### **D7. Is SSUM a forecasting or prediction system?**
+
+No.
+
+SSUM itself does **not perform forecasting**, **prediction**, or **probabilistic inference**.
+
+Classical arithmetic computes exact values but has no memory of how those values were reached.  
+Forecasting tools build models and expectations to estimate what may happen next.
+
+SSUM operates at a different layer.
+
+SSUM **never replaces numbers**, **never estimates outcomes**, and **never alters classical results**.  
+It exposes a **deterministic structural layer** that measures stability, coherence, and accumulated stress alongside each value, while always collapsing exactly to the original magnitude:
+
+```
+phi((m, a, s)) = m
+```
+
+The structural signals produced by SSUM **may be used by downstream systems** (such as analysis, alerting, or projection layers) as reliable inputs.
+
+SSUM provides **structural observability**, not prediction.  
+Any forecasting or inference occurs **above SSUM**, without compromising classical correctness.
+
+---
+
 ## **SECTION E — Adoption & Future Extensions**
 
 ### **E1. How do I integrate SSUM into existing systems?**
