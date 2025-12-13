@@ -59,6 +59,14 @@ SSUM reveals **how numerical behaviour evolves across calculations**.
 
 ---
 
+### 🔎 SSUM Observatory (Live Numerical Evidence)
+
+For concrete, browser-only demonstrations showing how SSUM reveals structural behaviour in real numerical methods (while preserving exact classical results), see the SSUM Observatory:
+
+https://github.com/OMPSHUNYAYA/ssum-observatory
+
+---
+
 ### **Clarification: SSUM, Structural Signals, and Forecasting**
 
 Classical arithmetic treats numbers as **memoryless magnitudes**.  
