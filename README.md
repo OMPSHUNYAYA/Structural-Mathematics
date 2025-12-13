@@ -59,6 +59,29 @@ SSUM reveals **how numerical behaviour evolves across calculations**.
 
 ---
 
+### **Clarification: SSUM, Structural Signals, and Forecasting**
+
+Classical arithmetic treats numbers as **memoryless magnitudes**.  
+Forecasting tools build **models and expectations** to estimate what may happen next.
+
+SSUM operates at a different layer.
+
+SSUM itself is **not a forecasting engine** and does **not perform probabilistic inference**.
+
+SSUM **never replaces numbers**, **never estimates outcomes**, and **never alters classical results**.  
+It exposes a **deterministic structural layer** that measures stability, coherence, and accumulated stress alongside each value — while always collapsing exactly to the original magnitude:
+
+```
+phi((m, a, s)) = m
+```
+
+This structural information may be **used by downstream systems** (e.g., analysis, alerting, or projection layers) as reliable input signals.
+
+SSUM provides **structural observability**, not prediction.  
+Any projection or inference occurs **above SSUM**, without compromising classical correctness.
+
+---
+
 ## 🧪 **Live Demo (Proof of Concept)**
 
 A fully self-contained, offline, single-file demo is included with this repository.
